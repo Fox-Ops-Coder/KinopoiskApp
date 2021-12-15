@@ -226,6 +226,7 @@ public final class FilmViewModel extends ViewModel implements FilmModel, WatchDa
 
             FilmPage filmPage = new FilmPage();
             filmPage.Pages = 1;
+            filmPage.Favorite = true;
             filmPage.Films = filmShortInfos;
 
             filmPageMutableLiveData.postValue(filmPage);
@@ -267,6 +268,15 @@ public final class FilmViewModel extends ViewModel implements FilmModel, WatchDa
         {
             Watch watch = kinopoiskDao.getWatch(filmShortInfo.filmId);
             kinopoiskDao.removeFromWatchList(watch);
+
+            FilmPage filmPage = filmPageMutableLiveData.getValue();
+            assert filmPage != null;
+
+            if (filmPage.Favorite)
+            {
+                filmPage.Films.remove(filmShortInfo);
+                filmPageMutableLiveData.postValue(filmPage);
+            }
         });
     }
 

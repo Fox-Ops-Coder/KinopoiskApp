@@ -75,9 +75,8 @@ public final class FilmListAdapter extends RecyclerView.Adapter<FilmListAdapter.
 
     public void setFilms(@NonNull List<FilmShortInfo> filmList)
     {
-        notifyItemRangeRemoved(0, this.filmList.size());
         this.filmList = filmList;
-        notifyItemRangeInserted(0, this.filmList.size());
+        notifyDataSetChanged();
     }
 
     @Override
