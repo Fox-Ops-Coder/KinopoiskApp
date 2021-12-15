@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "5e270019298d79234a28c2d2a54d6ad1",
+    "identityHash": "5f2ced68b28e435b28a1d9cdaa5a8716",
     "entities": [
       {
         "tableName": "WatchList",
@@ -32,7 +32,7 @@
       },
       {
         "tableName": "Films",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`watchId` INTEGER NOT NULL, `filmId` INTEGER NOT NULL, `nameRu` TEXT NOT NULL, `nameEn` TEXT NOT NULL, `year` TEXT NOT NULL, `country` TEXT NOT NULL, `genre` TEXT NOT NULL, PRIMARY KEY(`filmId`), FOREIGN KEY(`watchId`) REFERENCES `WatchList`(`WatchId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`watchId` INTEGER NOT NULL, `filmId` INTEGER NOT NULL, `nameRu` TEXT NOT NULL, `nameEn` TEXT NOT NULL, `year` TEXT NOT NULL, `rating` TEXT NOT NULL, `country` TEXT NOT NULL, `genre` TEXT NOT NULL, `poster` TEXT NOT NULL, PRIMARY KEY(`filmId`), FOREIGN KEY(`watchId`) REFERENCES `WatchList`(`WatchId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "watchId",
@@ -65,6 +65,12 @@
             "notNull": true
           },
           {
+            "fieldPath": "rating",
+            "columnName": "rating",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
             "fieldPath": "country",
             "columnName": "country",
             "affinity": "TEXT",
@@ -73,6 +79,12 @@
           {
             "fieldPath": "genre",
             "columnName": "genre",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "poster",
+            "columnName": "poster",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -102,7 +114,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5e270019298d79234a28c2d2a54d6ad1')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5f2ced68b28e435b28a1d9cdaa5a8716')"
     ]
   }
 }

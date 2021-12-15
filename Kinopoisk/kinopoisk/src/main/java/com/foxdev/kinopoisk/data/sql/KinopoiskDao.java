@@ -18,7 +18,7 @@ import java.util.List;
 public interface KinopoiskDao
 {
     @Insert(onConflict = ABORT)
-    void addToWatchList(@NonNull Watch filmWatch);
+    long addToWatchList(@NonNull Watch filmWatch);
 
     @Insert(onConflict = ABORT)
     void addFilmToWatchList(@NonNull FilmWatchData filmWatchData);
@@ -29,6 +29,10 @@ public interface KinopoiskDao
     @NonNull
     @Query("SELECT * FROM WatchList")
     List<Watch> getWatchList();
+
+    @NonNull
+    @Query("SELECT * FROM Films")
+    List<FilmWatchData> getFilms();
 
     @NonNull
     @Query("SELECT * FROM WatchList WHERE FilmId = :filmId")

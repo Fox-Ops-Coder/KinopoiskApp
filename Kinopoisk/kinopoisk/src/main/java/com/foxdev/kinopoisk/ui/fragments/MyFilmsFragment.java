@@ -34,6 +34,17 @@ public final class MyFilmsFragment extends Fragment {
         FilmViewModel filmViewModel = new ViewModelProvider(requireActivity())
                 .get(FilmViewModel.class);
 
+        FilmListAdapter filmListAdapter = new FilmListAdapter(filmViewModel);
+        fragmentFilmListBinding.filmList.setAdapter(filmListAdapter);
+
+        filmViewModel.getFilmPageLiveData().observe(getViewLifecycleOwner(), filmPage ->
+        {
+            if (filmPage != null)
+                filmListAdapter.setFilms(filmPage.Films);
+        });
+
+        filmViewModel.getFavoriteFilms();
+
         return fragmentFilmListBinding.getRoot();
     }
 }

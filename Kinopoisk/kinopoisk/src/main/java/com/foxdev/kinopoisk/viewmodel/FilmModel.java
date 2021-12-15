@@ -11,4 +11,6 @@ public interface FilmModel
     void searchFilms(@NonNull final String keyword, final int pageNumber);
 
     void searchFilms(@NonNull final String keyword);
+    
+    void getFavoriteFilms();
 }

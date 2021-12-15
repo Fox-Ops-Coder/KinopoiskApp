@@ -6,14 +6,17 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.foxdev.kinopoisk.data.net.ServerInterface;
+import com.foxdev.kinopoisk.data.objects.Country;
 import com.foxdev.kinopoisk.data.objects.Film;
 import com.foxdev.kinopoisk.data.objects.FilmPage;
 import com.foxdev.kinopoisk.data.objects.FilmSearch;
 import com.foxdev.kinopoisk.data.objects.FilmShortInfo;
 import com.foxdev.kinopoisk.data.objects.FilmWatchData;
+import com.foxdev.kinopoisk.data.objects.Genre;
 import com.foxdev.kinopoisk.data.objects.Watch;
 import com.foxdev.kinopoisk.data.sql.KinopoiskDao;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -187,6 +190,47 @@ public final class FilmViewModel extends ViewModel implements FilmModel, WatchDa
         searchFilms(keyword, 1);
     }
 
+    @Override
+    public void getFavoriteFilms()
+    {
+        executor.submit(() ->
+        {
+            List<FilmWatchData> watchDataList = kinopoiskDao.getFilms();
+            ArrayList<FilmShortInfo> filmShortInfos = new ArrayList<>(watchDataList.size());
+
+            for (int index = 0; index < watchDataList.size(); ++index)
+            {
+                FilmShortInfo filmShortInfo = new FilmShortInfo();
+                FilmWatchData filmWatchData = watchDataList.get(index);
+
+                filmShortInfo.filmId = filmWatchData.filmId;
+                filmShortInfo.nameRu = filmWatchData.nameRu;
+                filmShortInfo.nameEn = filmWatchData.nameEn;
+                filmShortInfo.year = filmWatchData.year;
+                filmShortInfo.rating = filmWatchData.rating;
+                filmShortInfo.posterUrlPreview = filmWatchData.poster;
+
+                filmShortInfo.inWatchList = true;
+
+                Genre genre = new Genre();
+                genre.FilmGenre = filmWatchData.genre;
+
+                Country country = new Country();
+                country.FilmCountry = filmWatchData.country;
+
+                filmShortInfo.genres.add(genre);
+                filmShortInfo.countries.add(country);
+
+                filmShortInfos.add(filmShortInfo);
+            }
+
+            FilmPage filmPage = new FilmPage();
+            filmPage.Pages = 1;
+            filmPage.Films = filmShortInfos;
+
+            filmPageMutableLiveData.postValue(filmPage);
+        });
+    }
 
     @Override
     @NonNull
@@ -197,7 +241,8 @@ public final class FilmViewModel extends ViewModel implements FilmModel, WatchDa
             Watch watch = new Watch();
             watch.FilmId = filmShortInfo.filmId;
 
-            kinopoiskDao.addToWatchList(watch);
+            long watchId = kinopoiskDao.addToWatchList(watch);
+            watch.WatchId = (int) watchId;
 
             FilmWatchData filmWatchData = new FilmWatchData();
             filmWatchData.filmId = filmShortInfo.filmId;
@@ -207,6 +252,8 @@ public final class FilmViewModel extends ViewModel implements FilmModel, WatchDa
             filmWatchData.nameRu = filmShortInfo.nameRu;
             filmWatchData.nameEn = filmShortInfo.nameEn;
             filmWatchData.year = filmShortInfo.year;
+            filmWatchData.rating = filmShortInfo.rating;
+            filmWatchData.poster = filmShortInfo.posterUrlPreview;
 
             kinopoiskDao.addFilmToWatchList(filmWatchData);
         });

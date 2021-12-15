@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.foxdev.kinopoisk.R;
 import com.foxdev.kinopoisk.databinding.ActivityMainBinding;
 import com.foxdev.kinopoisk.ui.fragments.FilmListFragment;
+import com.foxdev.kinopoisk.ui.fragments.MyFilmsFragment;
 import com.foxdev.kinopoisk.ui.fragments.SearchFragment;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -41,6 +42,10 @@ public final class MainActivity extends AppCompatActivity
             else if (item.getItemId() == R.id.top_page)
                 getSupportFragmentManager().beginTransaction()
                 .replace(activityMainBinding.appContent.getId(), new FilmListFragment())
+                .commit();
+            else if (item.getItemId() == R.id.my_films_page)
+                getSupportFragmentManager().beginTransaction()
+                .replace(activityMainBinding.appContent.getId(), new MyFilmsFragment())
                 .commit();
 
             return true;
