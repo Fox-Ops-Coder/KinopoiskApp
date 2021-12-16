@@ -17,7 +17,7 @@ public final class FilmShortInfo
     @SerializedName("nameRu")
     public String nameRu = "";
 
-    @NonNull
+    @Nullable
     @SerializedName("nameEn")
     public String nameEn = "";
 
@@ -59,7 +59,7 @@ public final class FilmShortInfo
     @NonNull
     public String OtherName()
     {
-        if (nameEn.isEmpty())
+        if (nameEn == null || nameEn.isEmpty())
             return year;
         else
             return nameEn + ", " + year;

@@ -7,7 +7,7 @@ import dagger.hilt.android.components.ViewModelComponent;
 
 @Module
 @InstallIn(ViewModelComponent.class)
-public class ServerModule
+public final class ServerModule
 {
     @Provides
     public static ServerInterface getServerInterface()
