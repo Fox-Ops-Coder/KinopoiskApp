@@ -16,6 +16,7 @@ import com.foxdev.kinopoisk.data.objects.Genre;
 import com.foxdev.kinopoisk.data.objects.Watch;
 import com.foxdev.kinopoisk.data.sql.KinopoiskDao;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -45,9 +46,6 @@ public final class FilmViewModel extends ViewModel implements FilmModel, WatchDa
     private final MutableLiveData<FilmPage> filmPageMutableLiveData;
 
     @NonNull
-    private final MutableLiveData<FilmSearch> filmSearchMutableLiveData;
-
-    @NonNull
     private final ExecutorService executor;
 
     @Inject
@@ -59,7 +57,6 @@ public final class FilmViewModel extends ViewModel implements FilmModel, WatchDa
 
         filmMutableLiveData = new MutableLiveData<>();
         filmPageMutableLiveData = new MutableLiveData<>();
-        filmSearchMutableLiveData = new MutableLiveData<>();
 
         executor = Executors.newSingleThreadExecutor();
     }
@@ -76,71 +73,88 @@ public final class FilmViewModel extends ViewModel implements FilmModel, WatchDa
         return filmPageMutableLiveData;
     }
 
-    @NonNull
-    public LiveData<FilmSearch> getFilmSearchLiveData()
-    {
-        return filmSearchMutableLiveData;
-    }
-
     public static void inWatchListFilms(@NonNull List<FilmShortInfo> films,
                                          @NonNull List<Watch> watchList)
     {
         for (int index = 0; index < films.size(); ++index)  //1
         {
-            boolean found = false;  //2
-            int jndex = 0;  //3
+            boolean found = false;
+            int jndex = 0;
 
-            while (!found && jndex < watchList.size())  //4, 5
+            while (!found && jndex < watchList.size())  //2, 3
             {
-                if (films.get(index).filmId == watchList.get(jndex).FilmId) //6
+                if (films.get(index).filmId == watchList.get(jndex).FilmId) //4
                 {
-                    found = true;   //8
-                    watchList.remove(jndex);    //9
-                    films.get(index).inWatchList = true;    //10
+                    found = true;
+                    watchList.remove(jndex);    //6
+                    films.get(index).inWatchList = true;
                 }
                 else
                 {
-                    ++jndex;    //7
+                    ++jndex;    //5
                 }
             }
         }
-    }   //11
+    }   //7
 
     public void handleResult(@NonNull FilmPage filmPage)
     {
         List<FilmShortInfo> films = filmPage.films; //1
 
-        executor.submit(() ->
+        List<Watch> watchList = kinopoiskDao.getWatchList();    //2
+
+        inWatchListFilms(films, watchList); //3
+
+        filmPageMutableLiveData.postValue(filmPage); //4
+    }
+
+    @NonNull
+    @Override
+    public Future<?> loadTopFilms(int pageNumber)
+    {
+        return executor.submit(() ->
         {
-            List<Watch> watchList = kinopoiskDao.getWatchList();    //2
+            try
+            {
+                Response<FilmPage> filmPageResponse = serverInterface
+                        .getTopFilm(pageNumber).execute();
 
-            inWatchListFilms(films, watchList); //3
+                if (filmPageResponse.isSuccessful() && filmPageResponse.body() != null) //1, 2
+                    handleResult(filmPageResponse.body());  //4
+                else
+                    filmPageMutableLiveData.postValue(null);
 
-            filmPageMutableLiveData.postValue(filmPage); //4
-        });
+            } catch (IOException e)
+            {
+                filmPageMutableLiveData.postValue(null);    //3
+            }
+        }); //5
     }
 
     @Override
-    public void loadTopFilms(int pageNumber)
+    public Future<?> loadTopFilms()
     {
-        serverInterface.getTopFilm(pageNumber).enqueue(new Callback<FilmPage>()
-        {
-            @Override
-            public void onResponse(@NonNull Call<FilmPage> call,
-                                   @NonNull Response<FilmPage> response)
-            {
-                if (response.isSuccessful() && response.body() != null) //1, 2
-                {
-                    handleResult(response.body()); //4
-                }
-                else
-                {
-                    filmPageMutableLiveData.postValue(null);    //3
-                }
-            }   //5
+        return loadTopFilms(1);
+    }
 
-            @Override
-            public void onFailure(@NonNull Call<FilmPage> call, @NonNull Throwable t)
+    @NonNull
+    @Override
+    public Future<?> searchFilms(@NonNull String keyword, int pageNumber)
+    {
+        return executor.submit(() ->
+        {
+            try
+            {
+                Response<FilmSearch> filmSearchResponse = serverInterface
+                        .searchFilm(keyword, pageNumber).execute();
+
+                if (filmSearchResponse.isSuccessful() && filmSearchResponse.body() != null)
+                    handleResult(filmSearchResponse.body());
+                else
+                    filmPageMutableLiveData.postValue(null);
+
+
+            } catch (IOException e)
             {
                 filmPageMutableLiveData.postValue(null);
             }
@@ -148,48 +162,16 @@ public final class FilmViewModel extends ViewModel implements FilmModel, WatchDa
     }
 
     @Override
-    public void loadTopFilms()
+    public Future<?> searchFilms(@NonNull String keyword)
     {
-        loadTopFilms(1);
+        return searchFilms(keyword, 1);
     }
 
     @Override
-    public void searchFilms(@NonNull String keyword, int pageNumber)
+    @NonNull
+    public Future<?> getFavoriteFilms()
     {
-        serverInterface.searchFilm(keyword, pageNumber).enqueue(new Callback<FilmSearch>()
-        {
-            @Override
-            public void onResponse(@NonNull Call<FilmSearch> call,
-                                   @NonNull Response<FilmSearch> response)
-            {
-                if (response.isSuccessful() && response.body() != null)
-                {
-                    handleResult(response.body());
-                }
-                else
-                {
-                    filmSearchMutableLiveData.postValue(null);
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<FilmSearch> call, @NonNull Throwable t)
-            {
-                filmSearchMutableLiveData.postValue(null);
-            }
-        });
-    }
-
-    @Override
-    public void searchFilms(@NonNull String keyword)
-    {
-        searchFilms(keyword, 1);
-    }
-
-    @Override
-    public void getFavoriteFilms()
-    {
-        executor.submit(() ->
+        return executor.submit(() ->
         {
             List<FilmWatchData> watchDataList = kinopoiskDao.getFilms();
             ArrayList<FilmShortInfo> filmShortInfos = new ArrayList<>(watchDataList.size());

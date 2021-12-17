@@ -2,15 +2,22 @@ package com.foxdev.kinopoisk.viewmodel;
 
 import androidx.annotation.NonNull;
 
+import java.util.concurrent.Future;
+
 public interface FilmModel
 {
-    void loadTopFilms(final int pageNumber);
+    @NonNull
+    Future<?> loadTopFilms(final int pageNumber);
 
-    void loadTopFilms();
+    @NonNull
+    Future<?> loadTopFilms();
 
-    void searchFilms(@NonNull final String keyword, final int pageNumber);
+    @NonNull
+    Future<?> searchFilms(@NonNull final String keyword, final int pageNumber);
 
-    void searchFilms(@NonNull final String keyword);
-    
-    void getFavoriteFilms();
+    @NonNull
+    Future<?> searchFilms(@NonNull final String keyword);
+
+    @NonNull
+    Future<?> getFavoriteFilms();
 }

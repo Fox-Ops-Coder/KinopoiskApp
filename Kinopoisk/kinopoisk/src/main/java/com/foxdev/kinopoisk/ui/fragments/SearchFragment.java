@@ -32,18 +32,12 @@ public final class SearchFragment extends Fragment
         FilmViewModel filmViewModel = new ViewModelProvider(requireActivity())
                 .get(FilmViewModel.class);
 
-        if (filmViewModel.getFilmSearchLiveData().getValue() != null)
-            fragmentSearchBinding.searchBox
-                    .setQuery(Objects
-                            .requireNonNull(filmViewModel.getFilmSearchLiveData()
-                                    .getValue()).keyword, false);
-
         FilmListAdapter filmListAdapter = new FilmListAdapter(filmViewModel);
         fragmentSearchBinding.searchList.setAdapter(filmListAdapter);
 
-        filmViewModel.getFilmSearchLiveData().observe(getViewLifecycleOwner(), filmSearch ->
+        filmViewModel.getFilmPageLiveData().observe(getViewLifecycleOwner(), filmSearch ->
         {
-            if (filmSearch != null)
+            if (filmSearch != null && fragmentSearchBinding.searchBox.getQuery().length() != 0)
                 filmListAdapter.setFilms(filmSearch.films);
         });
 
