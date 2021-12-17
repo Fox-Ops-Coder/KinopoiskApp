@@ -5,15 +5,16 @@ import androidx.annotation.NonNull;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public final class FilmPage
+public class FilmPage
 {
     @SerializedName("pagesCount")
-    public int Pages;
+    public int pagesCount;
 
-    public boolean Favorite = false;
+    public boolean favorite = false;
 
     @NonNull
     @SerializedName("films")
-    public ArrayList<FilmShortInfo> Films = new ArrayList<>();
+    public ArrayList<FilmShortInfo> films = new ArrayList<>();
 }

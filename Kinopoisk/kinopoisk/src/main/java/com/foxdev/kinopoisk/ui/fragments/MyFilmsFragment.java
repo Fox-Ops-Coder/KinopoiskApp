@@ -2,6 +2,7 @@ package com.foxdev.kinopoisk.ui.fragments;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -25,7 +26,7 @@ public final class MyFilmsFragment extends Fragment {
     public MyFilmsFragment() { }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
         FragmentFilmListBinding fragmentFilmListBinding = FragmentFilmListBinding
@@ -40,7 +41,7 @@ public final class MyFilmsFragment extends Fragment {
         filmViewModel.getFilmPageLiveData().observe(getViewLifecycleOwner(), filmPage ->
         {
             if (filmPage != null)
-                filmListAdapter.setFilms(filmPage.Films);
+                filmListAdapter.setFilms(filmPage.films);
         });
 
         filmViewModel.getFavoriteFilms();

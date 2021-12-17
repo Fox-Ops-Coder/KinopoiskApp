@@ -5,16 +5,11 @@ import androidx.annotation.NonNull;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public final class FilmSearch
+public final class FilmSearch extends FilmPage
 {
     @NonNull
     @SerializedName("keyword")
     public String keyword = "";
-
-    @SerializedName("pagesCount")
-    public int pagesCount;
-
-    @SerializedName("films")
-    public ArrayList<FilmShortInfo> films = new ArrayList<>();
 }

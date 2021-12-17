@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "5f2ced68b28e435b28a1d9cdaa5a8716",
+    "identityHash": "7c431e611fdd7a08d400e94903b9e9ce",
     "entities": [
       {
         "tableName": "WatchList",
@@ -32,7 +32,7 @@
       },
       {
         "tableName": "Films",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`watchId` INTEGER NOT NULL, `filmId` INTEGER NOT NULL, `nameRu` TEXT NOT NULL, `nameEn` TEXT NOT NULL, `year` TEXT NOT NULL, `rating` TEXT NOT NULL, `country` TEXT NOT NULL, `genre` TEXT NOT NULL, `poster` TEXT NOT NULL, PRIMARY KEY(`filmId`), FOREIGN KEY(`watchId`) REFERENCES `WatchList`(`WatchId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`watchId` INTEGER NOT NULL, `filmId` INTEGER NOT NULL, `nameRu` TEXT NOT NULL, `nameEn` TEXT, `year` TEXT NOT NULL, `rating` TEXT NOT NULL, `country` TEXT NOT NULL, `genre` TEXT NOT NULL, `poster` TEXT NOT NULL, PRIMARY KEY(`filmId`), FOREIGN KEY(`watchId`) REFERENCES `WatchList`(`WatchId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "watchId",
@@ -56,7 +56,7 @@
             "fieldPath": "nameEn",
             "columnName": "nameEn",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "year",
@@ -114,7 +114,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5f2ced68b28e435b28a1d9cdaa5a8716')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7c431e611fdd7a08d400e94903b9e9ce')"
     ]
   }
 }

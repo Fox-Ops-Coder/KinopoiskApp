@@ -43,7 +43,7 @@ public final class FilmListFragment extends Fragment
         filmViewModel.getFilmPageLiveData().observe(getViewLifecycleOwner(), filmPage ->
         {
             if (filmPage != null)
-                filmListAdapter.setFilms(filmPage.Films);
+                filmListAdapter.setFilms(filmPage.films);
         });
 
         filmViewModel.loadTopFilms();

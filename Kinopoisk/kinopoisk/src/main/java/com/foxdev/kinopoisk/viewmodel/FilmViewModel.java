@@ -82,28 +82,42 @@ public final class FilmViewModel extends ViewModel implements FilmModel, WatchDa
         return filmSearchMutableLiveData;
     }
 
-    private static void inWatchListFilms(@NonNull List<FilmShortInfo> films,
+    public static void inWatchListFilms(@NonNull List<FilmShortInfo> films,
                                          @NonNull List<Watch> watchList)
     {
-        for (int index = 0; index < films.size(); ++index)
+        for (int index = 0; index < films.size(); ++index)  //1
         {
-            boolean found = false;
-            int jndex = 0;
+            boolean found = false;  //2
+            int jndex = 0;  //3
 
-            while (!found && jndex < watchList.size())
+            while (!found && jndex < watchList.size())  //4, 5
             {
-                if ((int) films.get(index).filmId == watchList.get(jndex).FilmId)
+                if (films.get(index).filmId == watchList.get(jndex).FilmId) //6
                 {
-                    found = true;
-                    watchList.remove(jndex);
-                    films.get(index).inWatchList = true;
+                    found = true;   //8
+                    watchList.remove(jndex);    //9
+                    films.get(index).inWatchList = true;    //10
                 }
                 else
                 {
-                    ++jndex;
+                    ++jndex;    //7
                 }
             }
         }
+    }   //11
+
+    public void handleResult(@NonNull FilmPage filmPage)
+    {
+        List<FilmShortInfo> films = filmPage.films; //1
+
+        executor.submit(() ->
+        {
+            List<Watch> watchList = kinopoiskDao.getWatchList();    //2
+
+            inWatchListFilms(films, watchList); //3
+
+            filmPageMutableLiveData.postValue(filmPage); //4
+        });
     }
 
     @Override
@@ -115,24 +129,15 @@ public final class FilmViewModel extends ViewModel implements FilmModel, WatchDa
             public void onResponse(@NonNull Call<FilmPage> call,
                                    @NonNull Response<FilmPage> response)
             {
-                if (response.isSuccessful() && response.body() != null)
+                if (response.isSuccessful() && response.body() != null) //1, 2
                 {
-                    List<FilmShortInfo> films = response.body().Films;
-
-                    executor.submit(() ->
-                    {
-                        List<Watch> watchList = kinopoiskDao.getWatchList();
-
-                        inWatchListFilms(films, watchList);
-
-                        filmPageMutableLiveData.postValue(response.body());
-                    });
+                    handleResult(response.body()); //4
                 }
                 else
                 {
-                    filmPageMutableLiveData.postValue(null);
+                    filmPageMutableLiveData.postValue(null);    //3
                 }
-            }
+            }   //5
 
             @Override
             public void onFailure(@NonNull Call<FilmPage> call, @NonNull Throwable t)
@@ -159,16 +164,7 @@ public final class FilmViewModel extends ViewModel implements FilmModel, WatchDa
             {
                 if (response.isSuccessful() && response.body() != null)
                 {
-                    List<FilmShortInfo> films = response.body().films;
-
-                    executor.submit(() ->
-                    {
-                        List<Watch> watchList = kinopoiskDao.getWatchList();
-
-                        inWatchListFilms(films, watchList);
-
-                        filmSearchMutableLiveData.postValue(response.body());
-                    });
+                    handleResult(response.body());
                 }
                 else
                 {
@@ -225,9 +221,9 @@ public final class FilmViewModel extends ViewModel implements FilmModel, WatchDa
             }
 
             FilmPage filmPage = new FilmPage();
-            filmPage.Pages = 1;
-            filmPage.Favorite = true;
-            filmPage.Films = filmShortInfos;
+            filmPage.pagesCount = 1;
+            filmPage.favorite = true;
+            filmPage.films = filmShortInfos;
 
             filmPageMutableLiveData.postValue(filmPage);
         });
@@ -272,9 +268,9 @@ public final class FilmViewModel extends ViewModel implements FilmModel, WatchDa
             FilmPage filmPage = filmPageMutableLiveData.getValue();
             assert filmPage != null;
 
-            if (filmPage.Favorite)
+            if (filmPage.favorite)
             {
-                filmPage.Films.remove(filmShortInfo);
+                filmPage.films.remove(filmShortInfo);
                 filmPageMutableLiveData.postValue(filmPage);
             }
         });

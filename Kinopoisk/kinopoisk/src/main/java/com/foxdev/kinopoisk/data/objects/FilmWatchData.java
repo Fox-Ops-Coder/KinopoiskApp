@@ -5,6 +5,7 @@ import static androidx.room.ColumnInfo.TEXT;
 import static androidx.room.ForeignKey.CASCADE;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
@@ -27,9 +28,9 @@ public final class FilmWatchData
     @ColumnInfo(typeAffinity = TEXT)
     public String nameRu = "";
 
-    @NonNull
+    @Nullable
     @ColumnInfo(typeAffinity = TEXT)
-    public String nameEn = "";
+    public String nameEn = null;
 
     @NonNull
     @ColumnInfo(typeAffinity = TEXT)
