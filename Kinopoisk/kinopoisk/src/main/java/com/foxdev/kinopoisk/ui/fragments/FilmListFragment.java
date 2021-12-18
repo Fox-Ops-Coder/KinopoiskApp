@@ -40,6 +40,10 @@ public final class FilmListFragment extends Fragment
         FilmListAdapter filmListAdapter = new FilmListAdapter(filmViewModel);
         fragmentFilmListBinding.filmList.setAdapter(filmListAdapter);
 
+        getChildFragmentManager().beginTransaction()
+                .add(fragmentFilmListBinding.paginatorPlace.getId(), new PaginationFragment())
+                .commit();
+
         filmViewModel.getFilmPageLiveData().observe(getViewLifecycleOwner(), filmPage ->
         {
             if (filmPage != null)

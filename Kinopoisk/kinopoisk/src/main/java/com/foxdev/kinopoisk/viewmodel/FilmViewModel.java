@@ -120,9 +120,16 @@ public final class FilmViewModel extends ViewModel implements FilmModel, WatchDa
                         .getTopFilm(pageNumber).execute();
 
                 if (filmPageResponse.isSuccessful() && filmPageResponse.body() != null) //1, 2
-                    handleResult(filmPageResponse.body());  //4
+                {
+                    FilmPage filmPage = filmPageResponse.body();
+                    filmPage.currentPage = pageNumber;
+
+                    handleResult(filmPage);  //4
+                }
                 else
+                {
                     filmPageMutableLiveData.postValue(null);
+                }
 
             } catch (IOException e)
             {
@@ -149,9 +156,17 @@ public final class FilmViewModel extends ViewModel implements FilmModel, WatchDa
                         .searchFilm(keyword, pageNumber).execute();
 
                 if (filmSearchResponse.isSuccessful() && filmSearchResponse.body() != null)
-                    handleResult(filmSearchResponse.body());
+                {
+                    FilmSearch filmSearch = filmSearchResponse.body();
+                    filmSearch.currentPage = pageNumber;
+
+                    handleResult(filmSearch);
+                }
                 else
+                {
+
                     filmPageMutableLiveData.postValue(null);
+                }
 
 
             } catch (IOException e)
