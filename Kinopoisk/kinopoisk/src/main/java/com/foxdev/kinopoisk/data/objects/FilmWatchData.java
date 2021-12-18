@@ -40,11 +40,11 @@ public final class FilmWatchData
     @ColumnInfo(typeAffinity = TEXT)
     public String rating = "";
 
-    @NonNull
+    @Nullable
     @ColumnInfo(typeAffinity = TEXT)
     public String country = "";
 
-    @NonNull
+    @Nullable
     @ColumnInfo(typeAffinity = TEXT)
     public String genre = "";
 

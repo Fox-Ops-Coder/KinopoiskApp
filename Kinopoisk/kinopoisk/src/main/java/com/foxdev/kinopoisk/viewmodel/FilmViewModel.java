@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.function.Function;
 
 import javax.inject.Inject;
 
@@ -31,7 +32,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 @HiltViewModel
-public final class FilmViewModel extends ViewModel implements FilmModel, WatchDatabase
+public final class FilmViewModel extends ViewModel implements WatchDatabase
 {
     @NonNull
     private final KinopoiskDao kinopoiskDao;
@@ -109,7 +110,6 @@ public final class FilmViewModel extends ViewModel implements FilmModel, WatchDa
     }
 
     @NonNull
-    @Override
     public Future<?> loadTopFilms(int pageNumber)
     {
         return executor.submit(() ->
@@ -138,14 +138,12 @@ public final class FilmViewModel extends ViewModel implements FilmModel, WatchDa
         }); //5
     }
 
-    @Override
     public Future<?> loadTopFilms()
     {
         return loadTopFilms(1);
     }
 
     @NonNull
-    @Override
     public Future<?> searchFilms(@NonNull String keyword, int pageNumber)
     {
         return executor.submit(() ->
@@ -175,54 +173,22 @@ public final class FilmViewModel extends ViewModel implements FilmModel, WatchDa
         });
     }
 
-    @Override
     public Future<?> searchFilms(@NonNull String keyword)
     {
         return searchFilms(keyword, 1);
     }
 
-    @Override
+    @NonNull
+    public Future<?> getFavoriteFilms(int page)
+    {
+        return executor.submit(() ->
+                filmPageMutableLiveData.postValue(kinopoiskDao.getFilms(page)));
+    }
+
     @NonNull
     public Future<?> getFavoriteFilms()
     {
-        return executor.submit(() ->
-        {
-            List<FilmWatchData> watchDataList = kinopoiskDao.getFilms();
-            ArrayList<FilmShortInfo> filmShortInfos = new ArrayList<>(watchDataList.size());
-
-            for (int index = 0; index < watchDataList.size(); ++index)
-            {
-                FilmShortInfo filmShortInfo = new FilmShortInfo();
-                FilmWatchData filmWatchData = watchDataList.get(index);
-
-                filmShortInfo.filmId = filmWatchData.filmId;
-                filmShortInfo.nameRu = filmWatchData.nameRu;
-                filmShortInfo.nameEn = filmWatchData.nameEn;
-                filmShortInfo.year = filmWatchData.year;
-                filmShortInfo.rating = filmWatchData.rating;
-                filmShortInfo.posterUrlPreview = filmWatchData.poster;
-
-                filmShortInfo.inWatchList = true;
-
-                Genre genre = new Genre();
-                genre.FilmGenre = filmWatchData.genre;
-
-                Country country = new Country();
-                country.FilmCountry = filmWatchData.country;
-
-                filmShortInfo.genres.add(genre);
-                filmShortInfo.countries.add(country);
-
-                filmShortInfos.add(filmShortInfo);
-            }
-
-            FilmPage filmPage = new FilmPage();
-            filmPage.pagesCount = 1;
-            filmPage.favorite = true;
-            filmPage.films = filmShortInfos;
-
-            filmPageMutableLiveData.postValue(filmPage);
-        });
+        return getFavoriteFilms(1);
     }
 
     @Override
@@ -240,8 +206,17 @@ public final class FilmViewModel extends ViewModel implements FilmModel, WatchDa
             FilmWatchData filmWatchData = new FilmWatchData();
             filmWatchData.filmId = filmShortInfo.filmId;
             filmWatchData.watchId = watch.WatchId;
-            filmWatchData.country = filmShortInfo.countries.get(0).FilmCountry;
-            filmWatchData.genre = filmShortInfo.genres.get(0).FilmGenre;
+
+            if (filmShortInfo.countries.size() != 0)
+                filmWatchData.country = filmShortInfo.countries.get(0).FilmCountry;
+            else
+                filmWatchData.country = null;
+
+            if (filmShortInfo.genres.size() != 0)
+                filmWatchData.genre = filmShortInfo.genres.get(0).FilmGenre;
+            else
+                filmWatchData.genre = null;
+
             filmWatchData.nameRu = filmShortInfo.nameRu;
             filmWatchData.nameEn = filmShortInfo.nameEn;
             filmWatchData.year = filmShortInfo.year;

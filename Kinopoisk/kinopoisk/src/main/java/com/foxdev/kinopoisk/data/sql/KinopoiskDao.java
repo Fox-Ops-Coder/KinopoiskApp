@@ -8,33 +8,92 @@ import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Transaction;
 
+import com.foxdev.kinopoisk.data.objects.Country;
+import com.foxdev.kinopoisk.data.objects.FilmPage;
+import com.foxdev.kinopoisk.data.objects.FilmShortInfo;
 import com.foxdev.kinopoisk.data.objects.FilmWatchData;
+import com.foxdev.kinopoisk.data.objects.Genre;
 import com.foxdev.kinopoisk.data.objects.Watch;
 
 import java.util.List;
 
 @Dao
-public interface KinopoiskDao
+public abstract class KinopoiskDao
 {
     @Insert(onConflict = ABORT)
-    long addToWatchList(@NonNull Watch filmWatch);
+    public abstract long addToWatchList(@NonNull Watch filmWatch);
 
     @Insert(onConflict = ABORT)
-    void addFilmToWatchList(@NonNull FilmWatchData filmWatchData);
+    public abstract void addFilmToWatchList(@NonNull FilmWatchData filmWatchData);
 
     @Delete
-    void removeFromWatchList(@NonNull Watch filmWatch);
+    public abstract void removeFromWatchList(@NonNull Watch filmWatch);
 
     @NonNull
     @Query("SELECT * FROM WatchList")
-    List<Watch> getWatchList();
-
-    @NonNull
-    @Query("SELECT * FROM Films")
-    List<FilmWatchData> getFilms();
+    public abstract List<Watch> getWatchList();
 
     @NonNull
     @Query("SELECT * FROM WatchList WHERE FilmId = :filmId")
-    Watch getWatch(final int filmId);
+    public abstract Watch getWatch(final int filmId);
+
+    @Query("SELECT COUNT(*) FROM WatchList")
+    protected abstract int filmsCount();
+
+    @Query("SELECT * FROM Films LIMIT 20 OFFSET :offset")
+    protected abstract List<FilmWatchData> getFilmsPage(int offset);
+
+    @NonNull
+    @Transaction
+    public FilmPage getFilms(int page)
+    {
+        FilmPage filmPage = new FilmPage();
+        int filmsCount = filmsCount();
+        int pagesCount = filmsCount / 20 + 1;
+
+        filmPage.currentPage = page;
+        filmPage.pagesCount = pagesCount;
+
+        if (page <= pagesCount)
+        {
+            List<FilmWatchData> filmWatchDataList = getFilmsPage((page - 1) * 20);
+
+            for (int index = 0; index < filmWatchDataList.size(); ++index)
+            {
+                FilmShortInfo filmShortInfo = new FilmShortInfo();
+                FilmWatchData filmWatchData = filmWatchDataList.get(index);
+
+                filmShortInfo.filmId = filmWatchData.filmId;
+                filmShortInfo.nameRu = filmWatchData.nameRu;
+                filmShortInfo.nameEn = filmWatchData.nameEn;
+                filmShortInfo.year = filmWatchData.year;
+                filmShortInfo.rating = filmWatchData.rating;
+                filmShortInfo.posterUrlPreview = filmWatchData.poster;
+
+                filmShortInfo.inWatchList = true;
+
+                if (filmWatchData.genre != null)
+                {
+                    Genre genre = new Genre();
+                    genre.FilmGenre = filmWatchData.genre;
+
+                    filmShortInfo.genres.add(genre);
+                }
+
+                if (filmWatchData.country != null)
+                {
+                    Country country = new Country();
+                    country.FilmCountry = filmWatchData.country;
+
+                    filmShortInfo.countries.add(country);
+                }
+
+                filmPage.films.add(filmShortInfo);
+            }
+        }
+
+        return filmPage;
+    }
 }
