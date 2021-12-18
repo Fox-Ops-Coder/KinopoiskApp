@@ -164,7 +164,6 @@ public final class FilmViewModel extends ViewModel implements FilmModel, WatchDa
                 }
                 else
                 {
-
                     filmPageMutableLiveData.postValue(null);
                 }
 

@@ -24,7 +24,6 @@ import java.util.concurrent.Future;
 
 public final class FilmListFragment extends Fragment
 {
-
     public FilmListFragment() { }
 
     @Override
@@ -41,7 +40,8 @@ public final class FilmListFragment extends Fragment
         fragmentFilmListBinding.filmList.setAdapter(filmListAdapter);
 
         getChildFragmentManager().beginTransaction()
-                .add(fragmentFilmListBinding.paginatorPlace.getId(), new PaginationFragment())
+                .add(fragmentFilmListBinding.paginatorPlace.getId(),
+                        new TopFilmPaginationFragment())
                 .commit();
 
         filmViewModel.getFilmPageLiveData().observe(getViewLifecycleOwner(), filmPage ->

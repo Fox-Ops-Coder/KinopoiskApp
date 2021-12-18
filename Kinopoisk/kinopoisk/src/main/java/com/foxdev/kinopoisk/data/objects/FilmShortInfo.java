@@ -68,7 +68,15 @@ public final class FilmShortInfo
     @NonNull
     public String FilmInfo()
     {
-        return countries.get(0).FilmCountry + " • " + genres.get(0).FilmGenre;
+        String resultString = "";
+
+        if (countries.size() != 0)
+            resultString += countries.get(0).FilmCountry + " • ";
+
+        if (genres.size() != 0)
+            resultString += genres.get(0).FilmGenre;
+
+        return resultString;
     }
 
     @NonNull

@@ -33,7 +33,10 @@ public class FilmPage implements Pagination
     @NonNull
     public final String pagesCounter()
     {
-        return currentPage + " из " + pagesCount;
+        if (pagesCount != 0)
+            return currentPage + " из " + pagesCount;
+        else
+            return "0 из 0";
     }
 
     @Override

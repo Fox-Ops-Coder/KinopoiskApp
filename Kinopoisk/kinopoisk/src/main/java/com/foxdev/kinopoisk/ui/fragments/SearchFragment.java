@@ -11,16 +11,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.foxdev.kinopoisk.R;
 import com.foxdev.kinopoisk.adapters.FilmListAdapter;
 import com.foxdev.kinopoisk.databinding.FragmentSearchBinding;
 import com.foxdev.kinopoisk.viewmodel.FilmViewModel;
 
-import java.util.Objects;
-
 public final class SearchFragment extends Fragment
 {
-
     public SearchFragment() { }
 
     @Override
@@ -35,10 +31,24 @@ public final class SearchFragment extends Fragment
         FilmListAdapter filmListAdapter = new FilmListAdapter(filmViewModel);
         fragmentSearchBinding.searchList.setAdapter(filmListAdapter);
 
+        getChildFragmentManager().beginTransaction()
+                .add(fragmentSearchBinding.searchPagination.getId(),
+                        new FilmSearchPaginationFragment())
+                .commit();
+
         filmViewModel.getFilmPageLiveData().observe(getViewLifecycleOwner(), filmSearch ->
         {
             if (filmSearch != null && fragmentSearchBinding.searchBox.getQuery().length() != 0)
+            {
                 filmListAdapter.setFilms(filmSearch.films);
+
+                if (fragmentSearchBinding.searchPagination.getVisibility() == View.GONE)
+                    fragmentSearchBinding.searchPagination.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                fragmentSearchBinding.searchPagination.setVisibility(View.GONE);
+            }
         });
 
         fragmentSearchBinding.searchBox.setOnQueryTextListener(new SearchView.OnQueryTextListener()
