@@ -14,42 +14,42 @@ import java.util.List;
 
 public class InWatchTest
 {
-    @Test
-    public void noDataInServerResponse()
+    private static boolean AreEqual(@NonNull List<FilmShortInfo> expected,
+                                    @NonNull List<FilmShortInfo> actual)
     {
-        ArrayList<FilmShortInfo> filmShortInfos = new ArrayList<>();
-        ArrayList<Watch> watches = new ArrayList<>();
+        for (int index = 0; index < expected.size(); ++index)
+        {
+            if (expected.get(index).inWatchList != actual.get(index).inWatchList
+                    && expected.get(index).filmId == expected.get(index).filmId)
+                return false;
+        }
 
-        FilmViewModel.inWatchListFilms(filmShortInfos, watches);
+        return true;
     }
 
     @Test
     public void hasDataInServerResponseButNotInDatabase()
     {
         ArrayList<FilmShortInfo> filmShortInfos = new ArrayList<>();
+        ArrayList<FilmShortInfo> expected = new ArrayList<>();
+
         for (int index = 1; index <= 5; ++index)
         {
             FilmShortInfo filmShortInfo = new FilmShortInfo();
             filmShortInfo.filmId = index;
 
+            FilmShortInfo copy = new FilmShortInfo();
+            filmShortInfo.filmId = index;
+
             filmShortInfos.add(filmShortInfo);
+            expected.add(copy);
         }
 
         ArrayList<Watch> watches = new ArrayList<>();
 
         FilmViewModel.inWatchListFilms(filmShortInfos, watches);
-    }
 
-    private static boolean AreEqual(@NonNull List<FilmShortInfo> expected,
-                                    @NonNull List<FilmShortInfo> actual)
-    {
-        for (int index = 0; index < expected.size(); ++index)
-        {
-            if (expected.get(index).inWatchList != actual.get(index).inWatchList)
-                return false;
-        }
-
-        return true;
+        Assert.assertTrue(AreEqual(filmShortInfos, filmShortInfos));
     }
 
     @Test

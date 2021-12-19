@@ -100,13 +100,13 @@ public final class FilmViewModel extends ViewModel implements WatchDatabase
 
     public void handleResult(@NonNull FilmPage filmPage)
     {
-        List<FilmShortInfo> films = filmPage.films; //1
+        List<FilmShortInfo> films = filmPage.films;
 
-        List<Watch> watchList = kinopoiskDao.getWatchList();    //2
+        List<Watch> watchList = kinopoiskDao.getWatchList();
 
-        inWatchListFilms(films, watchList); //3
+        inWatchListFilms(films, watchList);
 
-        filmPageMutableLiveData.postValue(filmPage); //4
+        filmPageMutableLiveData.postValue(filmPage);
     }
 
     @NonNull
@@ -117,25 +117,25 @@ public final class FilmViewModel extends ViewModel implements WatchDatabase
             try
             {
                 Response<FilmPage> filmPageResponse = serverInterface
-                        .getTopFilm(pageNumber).execute();
+                        .getTopFilm(pageNumber).execute();  //1
 
-                if (filmPageResponse.isSuccessful() && filmPageResponse.body() != null) //1, 2
+                if (filmPageResponse.isSuccessful() && filmPageResponse.body() != null) //3, 4
                 {
                     FilmPage filmPage = filmPageResponse.body();
                     filmPage.currentPage = pageNumber;
 
-                    handleResult(filmPage);  //4
+                    handleResult(filmPage);
                 }
                 else
                 {
-                    filmPageMutableLiveData.postValue(null);
+                    filmPageMutableLiveData.postValue(null);    //5
                 }
 
             } catch (IOException e)
             {
-                filmPageMutableLiveData.postValue(null);    //3
+                filmPageMutableLiveData.postValue(null);    //2
             }
-        }); //5
+        }); //6
     }
 
     public Future<?> loadTopFilms()
