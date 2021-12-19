@@ -173,6 +173,7 @@ public final class FilmViewModel extends ViewModel implements WatchDatabase
         });
     }
 
+    @NonNull
     public Future<?> searchFilms(@NonNull String keyword)
     {
         return searchFilms(keyword, 1);
