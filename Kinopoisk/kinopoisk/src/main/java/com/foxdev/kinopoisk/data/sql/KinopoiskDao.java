@@ -46,8 +46,7 @@ public abstract class KinopoiskDao
     protected abstract List<FilmWatchData> getFilmsPage(int offset);
 
     @NonNull
-    @Transaction
-    public FilmPage getFilms(int page)
+    public final FilmPage getFilms(int page)
     {
         FilmPage filmPage = new FilmPage();
         int filmsCount = filmsCount();
@@ -56,11 +55,11 @@ public abstract class KinopoiskDao
         filmPage.currentPage = page;
         filmPage.pagesCount = pagesCount;
 
-        if (page <= pagesCount)
+        if (page <= pagesCount && page > 0) //1
         {
             List<FilmWatchData> filmWatchDataList = getFilmsPage((page - 1) * 20);
 
-            for (int index = 0; index < filmWatchDataList.size(); ++index)
+            for (int index = 0; index < filmWatchDataList.size(); ++index)  //2
             {
                 FilmShortInfo filmShortInfo = new FilmShortInfo();
                 FilmWatchData filmWatchData = filmWatchDataList.get(index);
@@ -74,26 +73,26 @@ public abstract class KinopoiskDao
 
                 filmShortInfo.inWatchList = true;
 
-                if (filmWatchData.genre != null)
+                if (filmWatchData.genre != null)    //3
                 {
                     Genre genre = new Genre();
                     genre.FilmGenre = filmWatchData.genre;
 
-                    filmShortInfo.genres.add(genre);
+                    filmShortInfo.genres.add(genre);    //4
                 }
 
-                if (filmWatchData.country != null)
+                if (filmWatchData.country != null)  //5
                 {
                     Country country = new Country();
                     country.FilmCountry = filmWatchData.country;
 
-                    filmShortInfo.countries.add(country);
+                    filmShortInfo.countries.add(country);   //6
                 }
 
                 filmPage.films.add(filmShortInfo);
             }
         }
 
-        return filmPage;
+        return filmPage;    //7
     }
 }

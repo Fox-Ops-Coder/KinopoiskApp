@@ -42,11 +42,11 @@ public final class FilmWatchData
 
     @Nullable
     @ColumnInfo(typeAffinity = TEXT)
-    public String country = "";
+    public String country = null;
 
     @Nullable
     @ColumnInfo(typeAffinity = TEXT)
-    public String genre = "";
+    public String genre = null;
 
     @NonNull
     @ColumnInfo(typeAffinity = TEXT)

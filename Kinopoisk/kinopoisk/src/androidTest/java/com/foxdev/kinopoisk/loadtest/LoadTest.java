@@ -311,4 +311,29 @@ public class LoadTest
         Assert.assertNotNull(filmViewModel.getFilmPageLiveData().getValue());
     }
 
+    @Test
+    public void Load() throws InterruptedException
+    {
+        Application application = ApplicationProvider.getApplicationContext();
+
+        KinopoiskDao kinopoiskDao = Room
+                .inMemoryDatabaseBuilder(application.getApplicationContext(),
+                        KinopoiskDatabase.class)
+                .build().GetKinopoiskDao();
+
+        ServerInterface serverInterface = new KinopoiskServer();
+
+        FilmViewModel filmViewModel = new FilmViewModel(kinopoiskDao, serverInterface);
+
+        Future<?> loadTask = filmViewModel.loadTopFilms();
+
+        synchronized (this)
+        {
+            while (!loadTask.isDone())
+                wait(1000);
+        }
+
+        Assert.assertNotNull(filmViewModel.getFilmPageLiveData().getValue());
+    }
+
 }
