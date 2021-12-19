@@ -55,11 +55,11 @@ public abstract class KinopoiskDao
         filmPage.currentPage = page;
         filmPage.pagesCount = pagesCount;
 
-        if (page <= pagesCount && page > 0) //1
+        if (page <= pagesCount && page > 0) //1, 2
         {
             List<FilmWatchData> filmWatchDataList = getFilmsPage((page - 1) * 20);
 
-            for (int index = 0; index < filmWatchDataList.size(); ++index)  //2
+            for (int index = 0; index < filmWatchDataList.size(); ++index)  //3
             {
                 FilmShortInfo filmShortInfo = new FilmShortInfo();
                 FilmWatchData filmWatchData = filmWatchDataList.get(index);
@@ -73,26 +73,26 @@ public abstract class KinopoiskDao
 
                 filmShortInfo.inWatchList = true;
 
-                if (filmWatchData.genre != null)    //3
+                if (filmWatchData.genre != null)    //4
                 {
                     Genre genre = new Genre();
                     genre.FilmGenre = filmWatchData.genre;
 
-                    filmShortInfo.genres.add(genre);    //4
+                    filmShortInfo.genres.add(genre);    //5
                 }
 
-                if (filmWatchData.country != null)  //5
+                if (filmWatchData.country != null)  //6
                 {
                     Country country = new Country();
                     country.FilmCountry = filmWatchData.country;
 
-                    filmShortInfo.countries.add(country);   //6
+                    filmShortInfo.countries.add(country);   //7
                 }
 
                 filmPage.films.add(filmShortInfo);
             }
         }
 
-        return filmPage;    //7
+        return filmPage;    //8
     }
 }
